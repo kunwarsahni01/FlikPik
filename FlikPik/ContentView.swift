@@ -8,17 +8,14 @@
 import SwiftUI
 
 struct ContentView: View {
+    @Environment(TMDbDataController.self) var tmdbController
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
+        MovieView(movieId: 549509)
     }
 }
 
 #Preview {
     ContentView()
+        .environment(TMDbDataController())
 }

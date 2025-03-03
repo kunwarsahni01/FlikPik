@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct FlikPikApp: App {
+    @State private var tmdbController = TMDbDataController()
+
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(tmdbController)
         }
     }
 }

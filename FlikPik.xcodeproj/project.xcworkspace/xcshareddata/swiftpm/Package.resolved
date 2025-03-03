@@ -1,0 +1,24 @@
+{
+  "originHash" : "6219f9b0eca887bbef7f8eec696649622915089b6e5d880dd6862d47d81a9f13",
+  "pins" : [
+    {
+      "identity" : "glur",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/joogps/Glur.git",
+      "state" : {
+        "revision" : "9e00ff79da318f2c78b749b1027e54a9d4de2e33",
+        "version" : "1.0.4"
+      }
+    },
+    {
+      "identity" : "tmdb",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/adamayoung/TMDb.git",
+      "state" : {
+        "revision" : "edbaefe23929ca109e1e1512e8d6a660d501a6de",
+        "version" : "13.3.0"
+      }
+    }
+  ],
+  "version" : 3
+}
