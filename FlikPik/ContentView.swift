@@ -12,7 +12,8 @@ struct ContentView: View {
     
     var body: some View {
         NavigationStack {
-            MovieView(movieId: 549509)
+            SearchView()
+                .environment(tmdbController)
         }
     }
 }

@@ -20,6 +20,15 @@ class TMDbDataController {
         let posterURL: URL?
         let releaseDate: Date?
     }
+    
+    // Structure to hold search results
+    struct MovieSearchResult: Identifiable {
+        let id: Int
+        let title: String
+        let overview: String
+        let posterURL: URL?
+        let releaseDate: Date?
+    }
 
 
     init() {
@@ -194,6 +203,39 @@ class TMDbDataController {
             print("Failed to fetch actor filmography")
             print(error.localizedDescription)
             return nil
+        }
+    }
+    
+    func searchMovies(query: String) async -> [MovieSearchResult]? {
+        // Don't search if query is empty or too short
+        guard !query.isEmpty, query.count >= 2 else {
+            return nil
+        }
+        
+        do {
+            // Search for movies matching the query
+            let searchResults = try await tmdbClient.search.searchMovies(query: query)
+            
+            // Map search results to our MovieSearchResult structure
+            let movies = searchResults.results.map { movie in
+                let posterPath = movie.posterPath?.absoluteString
+                let posterURL = posterPath != nil ? baseURL.appending(path: posterPath!) : nil
+                
+                return MovieSearchResult(
+                    id: movie.id,
+                    title: movie.title,
+                    overview: movie.overview,
+                    posterURL: posterURL,
+                    releaseDate: movie.releaseDate
+                )
+            }
+            
+            // Always return an array, even if empty, to distinguish between no results and error
+            return movies
+        } catch {
+            print("Failed to search movies")
+            print(error.localizedDescription)
+            return []
         }
     }
 }
