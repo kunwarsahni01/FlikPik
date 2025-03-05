@@ -18,10 +18,30 @@ struct MovieHeaderView: View {
             
             // Backdrop image with blur effect
             VStack {
-                AsyncImage(url: data?.backdropURL){ result in
-                    result.image?
-                        .resizable()
-                        .scaledToFill()
+                AsyncImage(url: data?.backdropURL) { phase in
+                    switch phase {
+                    case .empty:
+                        Rectangle()
+                            .fill(Color.gray.opacity(0.3))
+                            .scaledToFill()
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .scaledToFill()
+                    case .failure:
+                        Rectangle()
+                            .fill(Color.gray.opacity(0.3))
+                            .scaledToFill()
+                            .overlay(
+                                Image(systemName: "photo")
+                                    .foregroundColor(.white)
+                                    .font(.largeTitle)
+                            )
+                    @unknown default:
+                        Rectangle()
+                            .fill(Color.gray.opacity(0.3))
+                            .scaledToFill()
+                    }
                 }
                 .frame(width: 420, height: 615)
                 .glur(radius: 15.0,
@@ -35,11 +55,40 @@ struct MovieHeaderView: View {
             
             // Movie info overlay
             VStack {
-                AsyncImage(url: data?.logoURL){ result in
-                    result.image?
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 300, height: 80)
+                AsyncImage(url: data?.logoURL) { phase in
+                    switch phase {
+                    case .empty:
+//                        if let title = data?.movie.title {
+//                            Text(title)
+//                                .font(.largeTitle)
+//                                .fontWeight(.bold)
+//                                .foregroundColor(.white)
+//                                .multilineTextAlignment(.center)
+//                                .frame(width: 300, height: 80)
+//                        } else {
+                            Rectangle()
+                                .fill(Color.clear)
+                                .frame(width: 300, height: 80)
+//                        }
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 300, height: 80)
+                    case .failure:
+                        Text(data?.movie.title ?? "Movie Title")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                            .multilineTextAlignment(.center)
+                            .frame(width: 300, height: 80)
+                    @unknown default:
+                        Text(data?.movie.title ?? "")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                            .frame(width: 300, height: 80)
+                    }
                 }
                 .padding()
                 

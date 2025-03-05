@@ -16,7 +16,7 @@ class TMDbDataController {
     struct ActorMovie: Identifiable {
         let id: Int
         let title: String
-        let character: String
+        var character: String
         let posterURL: URL?
         let releaseDate: Date?
     }
@@ -35,14 +35,29 @@ class TMDbDataController {
             let movie = try await tmdbClient.movies.details(forMovie: id)
             let imageURLs = try await tmdbClient.movies.images(forMovie: id)
             
-            let backdrop = imageURLs.backdrops[0].filePath.absoluteString
-            let backdropURL = originalSizeBaseURL.appending(path: backdrop)
+            // Safely get backdrop URL or use nil
+            var backdropURL: URL? = nil
+            if !imageURLs.backdrops.isEmpty {
+                let backdrop = imageURLs.backdrops[0].filePath.absoluteString
+                backdropURL = originalSizeBaseURL.appending(path: backdrop)
+            }
             
-            let poster = imageURLs.posters[0].filePath.absoluteString
-            let posterURL = originalSizeBaseURL.appending(path: poster)
+            // Safely get poster URL or use nil
+            var posterURL: URL? = nil
+            if !imageURLs.posters.isEmpty {
+                let poster = imageURLs.posters[0].filePath.absoluteString
+                posterURL = originalSizeBaseURL.appending(path: poster)
+            } else if let posterPath = movie.posterPath?.absoluteString {
+                // Fallback to the poster from the movie details if available
+                posterURL = originalSizeBaseURL.appending(path: posterPath)
+            }
             
-            let logo = imageURLs.logos[0].filePath.absoluteString
-            let logoURL = originalSizeBaseURL.appending(path: logo)
+            // Safely get logo URL or use nil
+            var logoURL: URL? = nil
+            if !imageURLs.logos.isEmpty {
+                let logo = imageURLs.logos[0].filePath.absoluteString
+                logoURL = originalSizeBaseURL.appending(path: logo)
+            }
             
             // Create movie data without streaming providers and cast
             var movieData = MovieData(
@@ -133,7 +148,7 @@ class TMDbDataController {
             
             // Map the cast entries to our ActorMovie structure
             // Sort by release date (newest first) and limit to 20 movies
-            let movies = personCredits.cast
+            let sortedCredits = personCredits.cast
                 .sorted { 
                     // Sort by release date (newest first)
                     guard let date1 = $0.releaseDate, let date2 = $1.releaseDate else {
@@ -143,21 +158,38 @@ class TMDbDataController {
                     return date1 > date2
                 }
                 .prefix(20)
-                .map { credit in
-                    let posterPath = credit.posterPath?.absoluteString
-                    let posterURL = posterPath != nil ? baseURL.appending(path: posterPath!) : nil
-                    
-                                        
-                    return ActorMovie(
-                        id: credit.id,
-                        title: credit.title,
-                        character: "Unknown Role",
-                        posterURL: posterURL,
-                        releaseDate: credit.releaseDate
-                    )
-                }
             
-            return movies.isEmpty ? nil : Array(movies)
+            // Create array to hold our finished movies with accurate character data
+            var movies: [ActorMovie] = []
+            
+            // Process each movie to get actual character data
+            for credit in sortedCredits {
+                // Basic info available from credit
+                let posterPath = credit.posterPath?.absoluteString
+                let posterURL = posterPath != nil ? baseURL.appending(path: posterPath!) : nil
+                
+                // Create temporary movie with default character value
+                var movie = ActorMovie(
+                    id: credit.id,
+                    title: credit.title,
+                    character: "Unknown Role", // Default value
+                    posterURL: posterURL,
+                    releaseDate: credit.releaseDate
+                )
+                
+                // Fetch accurate character info from the movie's cast list
+                if let castMembers = await fetchCastMembers(forMovieId: credit.id) {
+                    // Look for this actor in the cast list
+                    if let actor = castMembers.first(where: { $0.id == actorId }) {
+                        // Update character with accurate data
+                        movie.character = actor.character
+                    }
+                }
+                
+                movies.append(movie)
+            }
+            
+            return movies.isEmpty ? nil : movies
         } catch {
             print("Failed to fetch actor filmography")
             print(error.localizedDescription)

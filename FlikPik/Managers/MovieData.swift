@@ -10,8 +10,8 @@ import TMDb
 
 struct MovieData {
     let movie: Movie
-    let backdropURL: URL
-    let posterURL: URL
+    let backdropURL: URL?
+    let posterURL: URL?
     let logoURL: URL?
     var streamingProviders: [StreamingProvider]?
     var castMembers: [CastMember]?

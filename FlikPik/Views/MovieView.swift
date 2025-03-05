@@ -24,9 +24,10 @@ struct MovieView: View {
                 
                 Spacer()
                 
-                StreamingSection(providers: data?.streamingProviders, movieTitle: data?.movie.title ?? "")
-                
                 CastSection(castMembers: data?.castMembers)
+                
+                StreamingSection(providers: data?.streamingProviders, movieTitle: data?.movie.title ?? "")
+
             }
         }
         .ignoresSafeArea(edges: [.top])

@@ -88,7 +88,7 @@ struct ActorDetailView: View {
                                                 .foregroundColor(.secondary)
                                         }
                                         
-                                        Text("as \(movie.character)")
+                                        Text(movie.character)
                                             .font(.caption)
                                             .foregroundColor(.secondary)
                                             .lineLimit(1)
@@ -115,6 +115,10 @@ struct ActorDetailView: View {
         }
         .navigationTitle(actorName)
         .navigationBarTitleDisplayMode(.inline)
+//        .toolbarBackground(.blue)
+//        .toolbarColorScheme(.dark)
+//        .toolbar(.hidden, for: .navigationBar)
+
         .task {
             await loadActorMovies()
         }
