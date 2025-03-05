@@ -11,7 +11,9 @@ struct ContentView: View {
     @Environment(TMDbDataController.self) var tmdbController
     
     var body: some View {
-        MovieView(movieId: 549509)
+        NavigationStack {
+            MovieView(movieId: 549509)
+        }
     }
 }
 

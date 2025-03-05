@@ -8,6 +8,11 @@
 import SwiftUI
 import TMDb
 import Glur
+#if os(iOS)
+import UIKit
+#elseif os(macOS)
+import AppKit
+#endif
 
 struct MovieView: View {
     @Environment(TMDbDataController.self) var tmdbController
@@ -89,6 +94,7 @@ struct MovieView: View {
                 fetchMovie()
             }
             
+            // Streaming Section
             VStack {
                 HStack(spacing: 3.0) {
                     Text("Streaming")
@@ -106,30 +112,40 @@ struct MovieView: View {
                 if let providers = data?.streamingProviders, !providers.isEmpty {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 16) {
-                            ForEach(providers, id: \.providerName) { provider in
-                                VStack {
-                                    AsyncImage(url: provider.providerLogoURL) { image in
-                                        image
-                                            .resizable()
-                                            .aspectRatio(contentMode: .fit)
-                                            .frame(width: 60, height: 60)
-                                            .cornerRadius(10)
-                                    } placeholder: {
-                                        RoundedRectangle(cornerRadius: 10)
-                                            .fill(Color.gray.opacity(0.3))
-                                            .frame(width: 60, height: 60)
+                            ForEach(providers) { provider in
+                                Button {
+                                    // Open streaming service when tapped
+                                    URLOpener.shared.openStreamingApp(
+                                        provider: provider, 
+                                        movieTitle: data?.movie.title ?? ""
+                                    )
+                                } label: {
+                                    VStack {
+                                        AsyncImage(url: provider.providerLogoURL) { image in
+                                            image
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fit)
+                                                .frame(width: 60, height: 60)
+                                                .cornerRadius(10)
+                                        } placeholder: {
+                                            RoundedRectangle(cornerRadius: 10)
+                                                .fill(Color.gray.opacity(0.3))
+                                                .frame(width: 60, height: 60)
+                                        }
+                                        
+                                        Text(provider.providerName)
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                            .frame(width: 80)
+                                            .lineLimit(1)
                                     }
-                                    
-                                    Text(provider.providerName)
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                        .frame(width: 80)
-                                        .lineLimit(1)
                                 }
+                                .buttonStyle(PlainButtonStyle())
                             }
                         }
-                        .padding(.leading)
+                        .padding([.leading, .bottom])
                     }
+                    
                 } else {
                     HStack {
                         Text("Not available for streaming")
@@ -138,7 +154,68 @@ struct MovieView: View {
                             .padding(.leading)
                         Spacer()
                     }
-//                    .padding()
+                }
+            }
+            
+            // Cast Section
+            VStack {
+                HStack(spacing: 3.0) {
+                    Text("Cast")
+                        .font(.title3)
+                        .fontWeight(.semibold)
+                    
+                    Image(systemName: "chevron.right")
+                        .fontWeight(.bold)
+                        .foregroundStyle(.secondary)
+                    
+                    Spacer()
+                }
+                .padding([.leading, .bottom])
+                
+                if let castMembers = data?.castMembers, !castMembers.isEmpty {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 16) {
+                            ForEach(castMembers, id: \.id) { castMember in
+                                NavigationLink(destination: ActorDetailView(actorId: castMember.id, actorName: castMember.name, profileURL: castMember.profileURL)) {
+                                    VStack {
+                                        AsyncImage(url: castMember.profileURL) { image in
+                                            image
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fit)
+                                                .frame(width: 80, height: 80)
+                                                .clipShape(Circle())
+                                        } placeholder: {
+                                            Circle()
+                                                .fill(Color.gray.opacity(0.3))
+                                                .frame(width: 80, height: 80)
+                                        }
+                                        
+                                        Text(castMember.name)
+                                            .font(.caption)
+                                            .bold()
+                                            .frame(width: 100)
+                                            .lineLimit(1)
+                                            .foregroundColor(.primary)
+                                        
+                                        Text(castMember.character)
+                                            .font(.caption2)
+                                            .foregroundColor(.secondary)
+                                            .frame(width: 100)
+                                            .lineLimit(1)
+                                    }
+                                }
+                            }
+                        }
+                        .padding(.leading)
+                    }
+                } else {
+                    HStack {
+                        Text("Cast information unavailable")
+                            .foregroundColor(.secondary)
+                            .italic()
+                            .padding(.leading)
+                        Spacer()
+                    }
                 }
             }
 
@@ -177,22 +254,30 @@ struct MovieView: View {
 }
 
 #Preview {
-    MovieView(movieId: 549509)
-        .environment(TMDbDataController())
+    NavigationStack {
+        MovieView(movieId: 549509)
+            .environment(TMDbDataController())
+    }
 }
 
 #Preview {
-    MovieView(movieId: 1064213)
-        .environment(TMDbDataController())
+    NavigationStack {
+        MovieView(movieId: 1064213)
+            .environment(TMDbDataController())
+    }
 }
 
 #Preview {
-    MovieView(movieId: 974576)
-        .environment(TMDbDataController())
+    NavigationStack {
+        MovieView(movieId: 974576)
+            .environment(TMDbDataController())
+    }
 }
 
 #Preview {
-    MovieView(movieId: 696506)
-        .environment(TMDbDataController())
+    NavigationStack {
+        MovieView(movieId: 696506)
+            .environment(TMDbDataController())
+    }
 }
 
