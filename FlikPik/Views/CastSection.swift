@@ -13,7 +13,7 @@ struct CastSection: View {
     var body: some View {
         VStack {
             SectionHeader(title: "Cast")
-//                .padding(.leading)
+                .padding(.leading)
             
             if let castMembers = castMembers, !castMembers.isEmpty {
                 CastMembersList(castMembers: castMembers)

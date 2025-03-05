@@ -48,14 +48,15 @@ class TMDbDataController {
             // And sort by vote count to get the highest quality images
             
             // Process backdrops - filter by language and sort by vote count (highest first)
-            let filteredBackdrops = imageURLs.backdrops.filter { 
-                $0.languageCode == "en" || $0.languageCode == nil
-            }.sorted(by: { 
-                // Handle optional vote counts by providing default values (0) for nil
-                let vote1 = $0.voteCount ?? 0
-                let vote2 = $1.voteCount ?? 0
-                return vote1 > vote2
-            })
+//            let filteredBackdrops = imageURLs.backdrops.filter { 
+//                $0.languageCode == "en" || $0.languageCode == nil
+//            }.sorted(by: { 
+//                // Handle optional vote counts by providing default values (0) for nil
+//                let vote1 = $0.voteCount ?? 0
+//                let vote2 = $1.voteCount ?? 0
+//                return vote1 > vote2
+//            })
+            let filteredBackdrops = imageURLs.backdrops
             
             // Process posters - filter by language and sort by vote count (highest first)
             let filteredPosters = imageURLs.posters.filter { 
@@ -155,14 +156,56 @@ class TMDbDataController {
         do {
             // Using the TMDb client to fetch watch providers
             let watchProviders = try await tmdbClient.movies.watchProviders(forMovie: id)
+                        
+            // Collect providers from all available categories (free, flatRate, buy, rent)
+            var allProviders = [WatchProvider]()
             
-            // Get US providers if available (or whatever locale needed)
-            guard let usProviders = watchProviders?.buy else {
+            // Add free providers if available
+            if let freeProviders = watchProviders?.free {
+                allProviders.append(contentsOf: freeProviders)
+            }
+            
+            // Add flat rate providers if available
+            if let flatRateProviders = watchProviders?.flatRate {
+                allProviders.append(contentsOf: flatRateProviders)
+            }
+            
+            // Add buy providers if available
+            if let buyProviders = watchProviders?.buy {
+                allProviders.append(contentsOf: buyProviders)
+            }
+            
+            // Add rent providers if available
+            if let rentProviders = watchProviders?.rent {
+                allProviders.append(contentsOf: rentProviders)
+            }
+            
+            // Return nil if no providers are available
+            guard !allProviders.isEmpty else {
                 return nil
             }
             
+            // Filter out unwanted providers (Google Play, Microsoft Store, Fandango)
+            let filteredProviders = allProviders.filter { provider in
+                let name = provider.name.lowercased()
+                return !name.contains("google play") && 
+                       !name.contains("microsoft") && 
+                       !name.contains("fandango")
+            }
+            
+            // Return nil if all providers were filtered out
+            guard !filteredProviders.isEmpty else {
+                return nil
+            }
+            
+            // Remove duplicates by creating a dictionary keyed by provider ID
+            var uniqueProviders = [Int: WatchProvider]()
+            for provider in filteredProviders {
+                uniqueProviders[provider.id] = provider
+            }
+            
             // Convert to our StreamingProvider model
-            return usProviders.map { provider in
+            return uniqueProviders.values.map { provider in
                 let logoPath = provider.logoPath?.absoluteString ?? ""
                 let providerLogoURL = baseURL.appending(path: logoPath)
                 

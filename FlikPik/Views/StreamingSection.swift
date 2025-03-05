@@ -14,7 +14,7 @@ struct StreamingSection: View {
     var body: some View {
         VStack {
             SectionHeader(title: "Streaming")
-//                .padding(.leading)
+                .padding(.leading)
             
             if let providers = providers, !providers.isEmpty {
                 StreamingProvidersList(providers: providers, movieTitle: movieTitle)

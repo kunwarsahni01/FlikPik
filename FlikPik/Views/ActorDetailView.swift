@@ -16,7 +16,8 @@ struct ActorDetailView: View {
     
     @State private var movies: [TMDbDataController.ActorMovie]?
     @State private var isLoading = true
-    
+    @Namespace var animation
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading) {
@@ -59,7 +60,9 @@ struct ActorDetailView: View {
                     // Movies List
                     LazyVStack(alignment: .leading, spacing: 16) {
                         ForEach(actorMovies, id: \.id) { movie in
-                            NavigationLink(destination: MovieView(movieId: movie.id)) {
+                            NavigationLink {
+                                MovieView(movieId: movie.id, animation: animation)
+                            } label: {
                                 HStack(spacing: 16) {
                                     // Movie Poster
                                     AsyncImage(url: movie.posterURL) { image in
@@ -96,9 +99,10 @@ struct ActorDetailView: View {
                                     
                                     Spacer()
                                 }
+                                .matchedTransitionSource(id: movie.id, in: animation)
                                 .padding(.horizontal)
+                                .buttonStyle(PlainButtonStyle())
                             }
-                            .buttonStyle(PlainButtonStyle())
                             
                             Divider()
                                 .padding(.horizontal)

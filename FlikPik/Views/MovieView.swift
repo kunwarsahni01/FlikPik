@@ -13,7 +13,8 @@ struct MovieView: View {
     @State private var data: MovieData?
     @State var movieId: Int
     @Environment(\.dismiss) var dismiss
-    
+    var animation: Namespace.ID
+
     var body: some View {
         ScrollView {
             MovieHeaderView(data: data)
@@ -31,6 +32,7 @@ struct MovieView: View {
             }
         }
         .ignoresSafeArea(edges: [.top])
+        .navigationTransition(.zoom(sourceID: movieId, in: animation))
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button {
@@ -39,9 +41,10 @@ struct MovieView: View {
                     ZStack {
                         Circle()
                             .foregroundStyle(.ultraThinMaterial)
-                            .frame(width: 28, height: 28)
+                            .frame(width: 30, height: 30)
                         
                         Image(systemName: "chevron.backward")
+                            .fontWeight(.bold)
                             .foregroundStyle(.regularMaterial)
                     }
                 }

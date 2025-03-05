@@ -26,6 +26,7 @@ struct SearchView: View {
     @State private var isSearching = false
     @State private var debouncedText = ""
     @State private var hasSearchedOnce = false
+    @Namespace var animation
     
     var body: some View {
         NavigationStack {
@@ -62,8 +63,11 @@ struct SearchView: View {
                             
                             List {
                                 ForEach(results) { movie in
-                                    NavigationLink(destination: MovieView(movieId: movie.id)) {
+                                    NavigationLink {
+                                        MovieView(movieId: movie.id, animation: animation)
+                                    } label: {
                                         SearchResultRow(movie: movie)
+                                            .matchedTransitionSource(id: movie.id, in: animation)
                                     }
                                 }
                             }
