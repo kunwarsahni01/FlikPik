@@ -44,27 +44,82 @@ class TMDbDataController {
             let movie = try await tmdbClient.movies.details(forMovie: id)
             let imageURLs = try await tmdbClient.movies.images(forMovie: id)
             
-            // Safely get backdrop URL or use nil
+            // Filter for English language images or no specified language (null)
+            // And sort by vote count to get the highest quality images
+            
+            // Process backdrops - filter by language and sort by vote count (highest first)
+            let filteredBackdrops = imageURLs.backdrops.filter { 
+                $0.languageCode == "en" || $0.languageCode == nil
+            }.sorted(by: { 
+                // Handle optional vote counts by providing default values (0) for nil
+                let vote1 = $0.voteCount ?? 0
+                let vote2 = $1.voteCount ?? 0
+                return vote1 > vote2
+            })
+            
+            // Process posters - filter by language and sort by vote count (highest first)
+            let filteredPosters = imageURLs.posters.filter { 
+                $0.languageCode == "en" || $0.languageCode == nil
+            }.sorted(by: { 
+                let vote1 = $0.voteCount ?? 0
+                let vote2 = $1.voteCount ?? 0
+                return vote1 > vote2
+            })
+            
+            // Process logos - filter by language and sort by vote count (highest first)
+            let filteredLogos = imageURLs.logos.filter { 
+                $0.languageCode == "en" || $0.languageCode == nil
+            }.sorted(by: { 
+                let vote1 = $0.voteCount ?? 0
+                let vote2 = $1.voteCount ?? 0
+                return vote1 > vote2
+            })
+            
+            // Safely get backdrop URL or use nil - prioritize English, highest voted
             var backdropURL: URL? = nil
-            if !imageURLs.backdrops.isEmpty {
-                let backdrop = imageURLs.backdrops[0].filePath.absoluteString
+            if !filteredBackdrops.isEmpty {
+                let backdrop = filteredBackdrops[0].filePath.absoluteString
+                backdropURL = originalSizeBaseURL.appending(path: backdrop)
+            } else if !imageURLs.backdrops.isEmpty {
+                // Fallback to any language if no English backdrops
+                let backdrop = imageURLs.backdrops.sorted(by: { 
+                    let vote1 = $0.voteCount ?? 0
+                    let vote2 = $1.voteCount ?? 0
+                    return vote1 > vote2
+                })[0].filePath.absoluteString
                 backdropURL = originalSizeBaseURL.appending(path: backdrop)
             }
             
-            // Safely get poster URL or use nil
+            // Safely get poster URL or use nil - prioritize English, highest voted
             var posterURL: URL? = nil
-            if !imageURLs.posters.isEmpty {
-                let poster = imageURLs.posters[0].filePath.absoluteString
+            if !filteredPosters.isEmpty {
+                let poster = filteredPosters[0].filePath.absoluteString
+                posterURL = originalSizeBaseURL.appending(path: poster)
+            } else if !imageURLs.posters.isEmpty {
+                // Fallback to any language if no English posters
+                let poster = imageURLs.posters.sorted(by: { 
+                    let vote1 = $0.voteCount ?? 0
+                    let vote2 = $1.voteCount ?? 0
+                    return vote1 > vote2
+                })[0].filePath.absoluteString
                 posterURL = originalSizeBaseURL.appending(path: poster)
             } else if let posterPath = movie.posterPath?.absoluteString {
-                // Fallback to the poster from the movie details if available
+                // Final fallback to the poster from the movie details if available
                 posterURL = originalSizeBaseURL.appending(path: posterPath)
             }
             
-            // Safely get logo URL or use nil
+            // Safely get logo URL or use nil - prioritize English, highest voted
             var logoURL: URL? = nil
-            if !imageURLs.logos.isEmpty {
-                let logo = imageURLs.logos[0].filePath.absoluteString
+            if !filteredLogos.isEmpty {
+                let logo = filteredLogos[0].filePath.absoluteString
+                logoURL = originalSizeBaseURL.appending(path: logo)
+            } else if !imageURLs.logos.isEmpty {
+                // Fallback to any language if no English logos
+                let logo = imageURLs.logos.sorted(by: { 
+                    let vote1 = $0.voteCount ?? 0
+                    let vote2 = $1.voteCount ?? 0
+                    return vote1 > vote2
+                })[0].filePath.absoluteString
                 logoURL = originalSizeBaseURL.appending(path: logo)
             }
             

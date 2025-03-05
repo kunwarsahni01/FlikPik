@@ -12,6 +12,7 @@ struct MovieView: View {
     @Environment(TMDbDataController.self) var tmdbController
     @State private var data: MovieData?
     @State var movieId: Int
+    @Environment(\.dismiss) var dismiss
     
     var body: some View {
         ScrollView {
@@ -27,10 +28,28 @@ struct MovieView: View {
                 CastSection(castMembers: data?.castMembers)
                 
                 StreamingSection(providers: data?.streamingProviders, movieTitle: data?.movie.title ?? "")
-
             }
         }
         .ignoresSafeArea(edges: [.top])
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    dismiss()
+                } label: {
+                    ZStack {
+                        Circle()
+                            .foregroundStyle(.ultraThinMaterial)
+                            .frame(width: 28, height: 28)
+                        
+                        Image(systemName: "chevron.backward")
+                            .foregroundStyle(.regularMaterial)
+                    }
+                }
+            }
+        }
+        .navigationTitle("")
+        .toolbarBackground(.hidden, for: .navigationBar)
+        .navigationBarBackButtonHidden(true)
     }
     
     func fetchMovie() {
@@ -39,32 +58,32 @@ struct MovieView: View {
         }
     }
 }
-
-#Preview {
-    NavigationStack {
-        MovieView(movieId: 549509)
-            .environment(TMDbDataController())
-    }
-}
-
-#Preview {
-    NavigationStack {
-        MovieView(movieId: 1064213)
-            .environment(TMDbDataController())
-    }
-}
-
-#Preview {
-    NavigationStack {
-        MovieView(movieId: 974576)
-            .environment(TMDbDataController())
-    }
-}
-
-#Preview {
-    NavigationStack {
-        MovieView(movieId: 696506)
-            .environment(TMDbDataController())
-    }
-}
+//
+//#Preview {
+//    NavigationStack {
+//        MovieView(movieId: 549509, animation: Namespace.ID())
+//            .environment(TMDbDataController())
+//    }
+//}
+//
+//#Preview {
+//    NavigationStack {
+//        MovieView(movieId: 1064213, animation: Namespace.ID())
+//            .environment(TMDbDataController())
+//    }
+//}
+//
+//#Preview {
+//    NavigationStack {
+//        MovieView(movieId: 974576, animation: Namespace.ID())
+//            .environment(TMDbDataController())
+//    }
+//}
+//
+//#Preview {
+//    NavigationStack {
+//        MovieView(movieId: 696506, , animation: 1)
+//            .environment(TMDbDataController())
+//    }
+//}
 

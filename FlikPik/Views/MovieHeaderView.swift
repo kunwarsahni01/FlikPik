@@ -83,7 +83,7 @@ struct MovieHeaderView: View {
                             .multilineTextAlignment(.center)
                             .frame(width: 300, height: 80)
                     @unknown default:
-                        Text(data?.movie.title ?? "")
+                        Text(data?.movie.title ?? "Movie Title")
                             .font(.largeTitle)
                             .fontWeight(.bold)
                             .foregroundColor(.white)
