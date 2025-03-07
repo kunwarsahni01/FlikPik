@@ -10,6 +10,7 @@ import TMDb
 
 struct MovieView: View {
     @Environment(TMDbDataController.self) var tmdbController
+    @Environment(LineUpManager.self) var lineUpManager
     @State private var data: MovieData?
     @State var movieId: Int
     @Environment(\.dismiss) var dismiss
@@ -62,31 +63,11 @@ struct MovieView: View {
     }
 }
 //
-//#Preview {
-//    NavigationStack {
-//        MovieView(movieId: 549509, animation: Namespace.ID())
-//            .environment(TMDbDataController())
-//    }
-//}
-//
-//#Preview {
-//    NavigationStack {
-//        MovieView(movieId: 1064213, animation: Namespace.ID())
-//            .environment(TMDbDataController())
-//    }
-//}
-//
-//#Preview {
-//    NavigationStack {
-//        MovieView(movieId: 974576, animation: Namespace.ID())
-//            .environment(TMDbDataController())
-//    }
-//}
-//
-//#Preview {
-//    NavigationStack {
-//        MovieView(movieId: 696506, , animation: 1)
-//            .environment(TMDbDataController())
-//    }
-//}
+#Preview {
+    NavigationStack {
+        MovieView(movieId: 549509, animation: Namespace().wrappedValue)
+            .environment(TMDbDataController())
+            .environment(LineUpManager())
+    }
+}
 

@@ -9,11 +9,12 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(TMDbDataController.self) var tmdbController
+    @Environment(LineUpManager.self) var lineUpManager
     
     var body: some View {
         NavigationStack {
-            SearchView()
-                .environment(tmdbController)
+            HomeView()
+                .navigationTitle("FlikPik")
         }
     }
 }
@@ -21,4 +22,5 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .environment(TMDbDataController())
+        .environment(LineUpManager())
 }

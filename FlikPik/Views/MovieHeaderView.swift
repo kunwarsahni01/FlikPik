@@ -94,7 +94,24 @@ struct MovieHeaderView: View {
                 
                 MovieMetadataView(releaseDate: data?.movie.releaseDate, runtime: data?.movie.runtime)
                 
-                AddToLineupButton()
+                if let movieData = data {
+                    LineUpActionButton(movie: movieData)
+                        .padding(.top, 5.0)
+                        .padding(.bottom, 7.0)
+                } else {
+                    // Placeholder button for when no movie data is available
+                    Button(action: {}) {
+                        Text("Add to Lineup")
+                            .fontWeight(.medium)
+                            .frame(width: 250, height: 45)
+                            .foregroundColor(.black)
+                            .background(Color.white.opacity(0.7))
+                            .cornerRadius(12)
+                    }
+                    .disabled(true)
+                    .padding(.top, 5.0)
+                    .padding(.bottom, 7.0)
+                }
                 
                 Text(data?.movie.overview ?? "")
                     .foregroundColor(Color.white)
@@ -106,21 +123,8 @@ struct MovieHeaderView: View {
     }
 }
 
-struct AddToLineupButton: View {
-    var body: some View {
-        Button(action: {print("Added to Lineup")}) {
-            Text("Add to Lineup")
-                .fontWeight(.medium)
-                .frame(width: 250, height: 45)
-                .foregroundColor(.black)
-                .background(Color.white)
-                .cornerRadius(12)
-        }
-        .padding(.top, 5.0)
-        .padding(.bottom, 7.0)
-    }
-}
 
 #Preview {
     MovieHeaderView(data: nil)
+        .environment(LineUpManager())
 }
