@@ -8,6 +8,44 @@
 import Foundation
 import TMDb
 
+// Custom model for trailers with additional functionality
+struct MovieTrailer: Identifiable, Codable {
+    let id: String
+    let name: String
+    let key: String
+    let site: String
+    let type: String
+    let thumbnailURL: URL?
+    
+    // Generate YouTube thumbnail URL
+    static func youTubeThumbnail(for videoKey: String) -> URL? {
+        return URL(string: "https://img.youtube.com/vi/\(videoKey)/hqdefault.jpg")
+    }
+    
+//    // YouTube deeplinks for iOS/iPadOS/tvOS
+//    var youtubeAppURL: URL? {
+//        if site.lowercased() == "youtube" {
+//            // Format: youtube://youtube.com/watch?v=VIDEO_ID
+//            return URL(string: "youtube://youtube.com/watch?v=\(key)")
+//        }
+//        return nil
+//    }
+//    
+//    // YouTube website URL (fallback)
+//    var youtubeWebURL: URL? {
+//        if site.lowercased() == "youtube" {
+//            // Format: https://www.youtube.com/watch?v=VIDEO_ID
+//            return URL(string: "https://www.youtube.com/watch?v=\(key)")
+//        }
+//        return nil
+//    }
+//    
+//    // Universal video URL (for backward compatibility)
+//    var videoURL: URL? {
+//        return youtubeWebURL
+//    }
+}
+
 @Observable
 class TMDbDataController {
     private let tmdbClient = TMDbClient(apiKey: "4ecabf108260aecf3aa547248da6a35d")
@@ -124,14 +162,15 @@ class TMDbDataController {
                 logoURL = originalSizeBaseURL.appending(path: logo)
             }
             
-            // Create movie data without streaming providers and cast
+            // Create movie data without additional data
             var movieData = MovieData(
                 movie: movie, 
                 backdropURL: backdropURL, 
                 posterURL: posterURL, 
                 logoURL: logoURL,
                 streamingProviders: nil,
-                castMembers: nil
+                castMembers: nil,
+                trailers: nil
             )
             
             // Fetch streaming providers and update movie data
@@ -142,6 +181,11 @@ class TMDbDataController {
             // Fetch cast members and update movie data
             if let cast = await fetchCastMembers(forMovieId: id) {
                 movieData.castMembers = cast
+            }
+            
+            // Fetch trailers and update movie data
+            if let trailers = await fetchMovieTrailers(forMovieId: id) {
+                movieData.trailers = trailers
             }
 
             return movieData
@@ -334,6 +378,61 @@ class TMDbDataController {
             print("Failed to search movies")
             print(error.localizedDescription)
             return []
+        }
+    }
+    
+    // Fetch movie trailers
+    func fetchMovieTrailers(forMovieId id: Int) async -> [MovieTrailer]? {
+        do {
+            // Get videos for the movie
+            let videos = try await tmdbClient.movies.videos(forMovie: id)
+            
+            // Filter for trailers and teasers from YouTube
+            var filteredVideos: [TMDb.VideoMetadata] = []
+            
+            for video in videos.results {
+                // Focus only on YouTube videos
+                let isYouTube = video.site.lowercased() == "youtube"
+                
+                // Check if it's a trailer or teaser
+                let isTrailerOrTeaser = (video.type == .trailer || video.type == .teaser)
+                
+                if isYouTube && isTrailerOrTeaser {
+                    filteredVideos.append(video)
+                }
+            }
+            
+            // Sort: prioritize trailers over teasers
+            filteredVideos.sort { video1, video2 in
+                // Trailers first
+                if video1.type == .trailer && video2.type == .teaser {
+                    return true
+                }
+                // Teasers last
+                else if video1.type == .teaser && video2.type == .trailer {
+                    return false
+                }
+                // Otherwise keep original order
+                return true
+            }
+            
+            // Map to our trailer model
+            let trailers = filteredVideos.map { video in
+                MovieTrailer(
+                    id: video.id,
+                    name: video.name,
+                    key: video.key,
+                    site: video.site,
+                    type: String(describing: video.type),
+                    thumbnailURL: MovieTrailer.youTubeThumbnail(for: video.key)
+                )
+            }
+            
+            return trailers.isEmpty ? nil : trailers
+        } catch {
+            print("Failed to fetch movie trailers")
+            print(error.localizedDescription)
+            return nil
         }
     }
 }

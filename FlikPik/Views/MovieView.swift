@@ -26,9 +26,11 @@ struct MovieView: View {
             VStack(spacing: 16) {
                 
                 Spacer()
-                
+                                
                 CastSection(castMembers: data?.castMembers)
                 
+                TrailerSection(trailers: data?.trailers)
+
                 StreamingSection(providers: data?.streamingProviders, movieTitle: data?.movie.title ?? "")
             }
         }

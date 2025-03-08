@@ -23,16 +23,17 @@ struct ActorDetailView: View {
             VStack(alignment: .leading) {
                 // Actor Header
                 HStack(spacing: 16) {
-                    AsyncImage(url: profileURL) { image in
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: 120, height: 120)
-                            .clipShape(Circle())
-                    } placeholder: {
-                        Circle()
-                            .fill(Color.gray.opacity(0.3))
-                            .frame(width: 120, height: 120)
+                    Group {
+                        if let profileURL = profileURL {
+                            CachedAsyncImage(url: profileURL, aspectRatio: 1)
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: 120, height: 120)
+                                .clipShape(Circle())
+                        } else {
+                            Circle()
+                                .fill(Color.gray.opacity(0.3))
+                                .frame(width: 120, height: 120)
+                        }
                     }
                     
                     VStack(alignment: .leading) {
@@ -65,17 +66,18 @@ struct ActorDetailView: View {
                             } label: {
                                 HStack(spacing: 16) {
                                     // Movie Poster
-                                    AsyncImage(url: movie.posterURL) { image in
-                                        image
-                                            .resizable()
-                                            .aspectRatio(contentMode: .fill)
-                                            .frame(width: 80, height: 120)
-                                            .cornerRadius(8)
-                                    } placeholder: {
-                                        Rectangle()
-                                            .fill(Color.gray.opacity(0.3))
-                                            .frame(width: 80, height: 120)
-                                            .cornerRadius(8)
+                                    Group {
+                                        if let posterURL = movie.posterURL {
+                                            CachedAsyncImage(url: posterURL, aspectRatio: 2/3)
+                                                .aspectRatio(contentMode: .fill)
+                                                .frame(width: 80, height: 120)
+                                                .cornerRadius(8)
+                                        } else {
+                                            Rectangle()
+                                                .fill(Color.gray.opacity(0.3))
+                                                .frame(width: 80, height: 120)
+                                                .cornerRadius(8)
+                                        }
                                     }
                                     
                                     // Movie Details

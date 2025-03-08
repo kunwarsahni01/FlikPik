@@ -24,16 +24,12 @@ class LineUpManager {
     func addToLineUp(_ movie: MovieData) {
         // Check if movie already exists in lineup
         if !movies.contains(where: { $0.id == movie.id }) {
-            // Debug: Print what we're adding
-            print("Adding movie to lineup: ID=\(movie.id), posterURL=\(String(describing: movie.posterURL))")
-            
             // Add new movie to the beginning of the array
             movies.insert(movie, at: 0)
             saveLineUp()
         } else {
             // Movie exists, update it (might fix URL issues)
             if let index = movies.firstIndex(where: { $0.id == movie.id }) {
-                print("Updating existing movie in lineup: ID=\(movie.id)")
                 movies[index] = movie
                 saveLineUp()
             }
@@ -58,6 +54,9 @@ class LineUpManager {
         
         if let encoded = try? encoder.encode(movies) {
             UserDefaults.standard.set(encoded, forKey: lineUpKey)
+            print("Successfully saved lineup to UserDefaults")
+        } else {
+            print("⚠️ ERROR: Failed to encode lineup for saving")
         }
     }
     
@@ -65,19 +64,19 @@ class LineUpManager {
     private func loadLineUp() {
         if let savedLineUp = UserDefaults.standard.data(forKey: lineUpKey) {
             do {
+                print("Found saved lineup data, attempting to decode...")
                 let decodedLineUp = try JSONDecoder().decode([MovieData].self, from: savedLineUp)
                 movies = decodedLineUp
                 print("Successfully loaded \(movies.count) movies from lineup")
                 
-                // Debug: Print the first movie's poster URL if available
-                if let firstMovie = movies.first {
-                    print("First movie poster URL: \(String(describing: firstMovie.posterURL))")
-                }
             } catch {
-                print("Error decoding lineup: \(error)")
+                print("⚠️ ERROR: Failed decoding lineup: \(error)")
+                print("Error description: \(error.localizedDescription)")
                 // If there's an error, clear the corrupted data
                 UserDefaults.standard.removeObject(forKey: lineUpKey)
             }
+        } else {
+            print("No saved lineup found in UserDefaults")
         }
     }
     

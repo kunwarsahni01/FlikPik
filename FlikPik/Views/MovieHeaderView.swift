@@ -37,10 +37,6 @@ struct MovieHeaderView: View {
                                     .foregroundColor(.white)
                                     .font(.largeTitle)
                             )
-                    @unknown default:
-                        Rectangle()
-                            .fill(Color.gray.opacity(0.3))
-                            .scaledToFill()
                     }
                 }
                 .frame(width: 420, height: 615)
@@ -55,39 +51,25 @@ struct MovieHeaderView: View {
             
             // Movie info overlay
             VStack {
-                AsyncImage(url: data?.logoURL) { phase in
-                    switch phase {
-                    case .empty:
-//                        if let title = data?.movie.title {
-//                            Text(title)
-//                                .font(.largeTitle)
-//                                .fontWeight(.bold)
-//                                .foregroundColor(.white)
-//                                .multilineTextAlignment(.center)
-//                                .frame(width: 300, height: 80)
-//                        } else {
+                Group {
+                    if let logoURL = data?.logoURL {
+                        CachedAsyncImage(url: logoURL)
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 300, height: 80)
+                    } else {
+                        // Show title as text if no logo is available
+                        if let title = data?.movie.title {
+                            Text(title)
+                                .font(.largeTitle)
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                                .multilineTextAlignment(.center)
+                                .frame(width: 300, height: 80)
+                        } else {
                             Rectangle()
                                 .fill(Color.clear)
                                 .frame(width: 300, height: 80)
-//                        }
-                    case .success(let image):
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 300, height: 80)
-                    case .failure:
-                        Text(data?.movie.title ?? "Movie Title")
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
-                            .multilineTextAlignment(.center)
-                            .frame(width: 300, height: 80)
-                    @unknown default:
-                        Text(data?.movie.title ?? "Movie Title")
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
-                            .frame(width: 300, height: 80)
+                        }
                     }
                 }
                 .padding()

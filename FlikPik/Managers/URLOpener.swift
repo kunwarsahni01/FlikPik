@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import TMDb
 
 class URLOpener {
     static let shared = URLOpener()
@@ -35,6 +36,13 @@ class URLOpener {
         } else {
             print("No link generated for \(provider.providerName)")
         }
+    }
+    
+    func openYoutube(trailer: MovieTrailer) {
+        let youtubeKey = trailer.key
+        let url = URL(string: "https://www.youtube.com/watch?v=\(youtubeKey)")!
+        print(url)
+        UIApplication.shared.open(url)
     }
 
     

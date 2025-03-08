@@ -169,34 +169,16 @@ struct SearchResultRow: View {
     
     var body: some View {
         HStack(spacing: 16) {
-            // Movie poster
-            AsyncImage(url: movie.posterURL) { phase in
-                switch phase {
-                case .empty:
-                    Rectangle()
-                        .fill(Color.gray.opacity(0.3))
-                        .frame(width: 60, height: 90)
-                        .cornerRadius(6)
-                case .success(let image):
-                    image
-                        .resizable()
+            // Movie poster using our cached image system
+            Group {
+                if let posterURL = movie.posterURL {
+                    CachedAsyncImage(url: posterURL, aspectRatio: 2/3)
                         .aspectRatio(contentMode: .fill)
                         .frame(width: 60, height: 90)
                         .cornerRadius(6)
-                case .failure:
-                    Rectangle()
-                        .fill(Color.gray.opacity(0.3))
+                } else {
+                    ImageLoadFailure(aspectRatio: 2/3)
                         .frame(width: 60, height: 90)
-                        .cornerRadius(6)
-                        .overlay(
-                            Image(systemName: "photo")
-                                .foregroundColor(.white)
-                        )
-                @unknown default:
-                    Rectangle()
-                        .fill(Color.gray.opacity(0.3))
-                        .frame(width: 60, height: 90)
-                        .cornerRadius(6)
                 }
             }
             

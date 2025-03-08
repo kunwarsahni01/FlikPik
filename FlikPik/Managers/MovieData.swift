@@ -36,6 +36,7 @@ struct MovieData: Identifiable, Codable {
     let logoURL: URL?
     var streamingProviders: [StreamingProvider]?
     var castMembers: [CastMember]?
+    var trailers: [MovieTrailer]?
     
     var id: Int {
         movie.id
@@ -43,13 +44,15 @@ struct MovieData: Identifiable, Codable {
     
     // Standard initializer
     init(movie: Movie, backdropURL: URL?, posterURL: URL?, logoURL: URL?, 
-         streamingProviders: [StreamingProvider]? = nil, castMembers: [CastMember]? = nil) {
+         streamingProviders: [StreamingProvider]? = nil, castMembers: [CastMember]? = nil,
+         trailers: [MovieTrailer]? = nil) {
         self.movie = movie
         self.backdropURL = backdropURL
         self.posterURL = posterURL
         self.logoURL = logoURL
         self.streamingProviders = streamingProviders
         self.castMembers = castMembers
+        self.trailers = trailers
     }
     
     // For persistence, we only need to save essential data
@@ -73,11 +76,6 @@ struct MovieData: Identifiable, Codable {
         try container.encodeIfPresent(backdropURLString, forKey: .backdropURL)
         try container.encodeIfPresent(posterURLString, forKey: .posterURL) 
         try container.encodeIfPresent(logoURLString, forKey: .logoURL)
-        
-        // Debug: Print the URLs we're encoding
-        #if DEBUG
-        print("Encoding movie \(movie.id) with posterURL: \(String(describing: posterURLString))")
-        #endif
     }
     
     // Custom decoding to convert SimpleMovie back to Movie

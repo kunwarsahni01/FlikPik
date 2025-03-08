@@ -28,16 +28,17 @@ struct CastMemberCard: View {
     var body: some View {
         NavigationLink(destination: ActorDetailView(actorId: castMember.id, actorName: castMember.name, profileURL: castMember.profileURL)) {
             VStack {
-                AsyncImage(url: castMember.profileURL) { image in
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 80, height: 80)
-                        .clipShape(Circle())
-                } placeholder: {
-                    Circle()
-                        .fill(Color.gray.opacity(0.3))
-                        .frame(width: 80, height: 80)
+                Group {
+                    if let profileURL = castMember.profileURL {
+                        CachedAsyncImage(url: profileURL, aspectRatio: 1)
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 80, height: 80)
+                            .clipShape(Circle())
+                    } else {
+                        Circle()
+                            .fill(Color.gray.opacity(0.3))
+                            .frame(width: 80, height: 80)
+                    }
                 }
                 
                 Text(castMember.name)

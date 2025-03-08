@@ -44,17 +44,28 @@ struct LineUpActionButton: View {
                 showingAlert = true
                 onAdd?()
             }
-            inLineUp.toggle()
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                inLineUp.toggle()
+            }
         }) {
             HStack {
-                Image(systemName: inLineUp ? "checkmark" : "plus")
-                    .font(.system(size: 16))
+                ZStack {
+                    Image(systemName: "plus")
+                        .font(.system(size: 16))
+                        .opacity(inLineUp ? 0 : 1)
+                        .scaleEffect(inLineUp ? 0.5 : 1)
+                        
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 16))
+                        .opacity(inLineUp ? 1 : 0)
+                        .scaleEffect(inLineUp ? 1 : 0.5)
+                }
                 Text(inLineUp ? "In Lineup" : "Add to Lineup")
             }
             .fontWeight(.medium)
             .frame(width: 250, height: 45)
-            .foregroundColor(inLineUp ? .white : .black)
-            .background(inLineUp ? Color.gray : Color.white)
+            .foregroundColor(.black)
+            .background(Color.white)
             .cornerRadius(12)
         }
 //        .alert("Added to Lineup", isPresented: $showingAlert) {
