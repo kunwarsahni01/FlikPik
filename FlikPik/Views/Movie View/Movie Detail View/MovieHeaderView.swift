@@ -19,27 +19,6 @@ struct MovieHeaderView: View {
             
             // Backdrop image with blur effect
             VStack {
-//                AsyncImage(url: data?.backdropURL) { phase in
-//                    switch phase {
-//                    case .empty:
-//                        Rectangle()
-//                            .fill(Color.gray.opacity(0.3))
-//                            .scaledToFill()
-//                    case .success(let image):
-//                        image
-//                            .resizable()
-//                            .scaledToFill()
-//                    case .failure:
-//                        Rectangle()
-//                            .fill(Color.gray.opacity(0.3))
-//                            .scaledToFill()
-//                            .overlay(
-//                                Image(systemName: "photo")
-//                                    .foregroundColor(.white)
-//                                    .font(.largeTitle)
-//                            )
-//                    }
-//                }
                 if let backdropURL = data?.backdropURL {
                     CachedAsyncImage(url: backdropURL)
                         .aspectRatio(contentMode: .fill)
@@ -100,10 +79,7 @@ struct MovieHeaderView: View {
                     .padding(.bottom, 7.0)
                 }
                 
-                Text(data?.movie.overview ?? "")
-                    .foregroundColor(Color.white)
-                    .lineLimit(3)
-                    .padding(.horizontal, 21.0)
+                DynamicOverviewView(overview: data?.movie.overview)
             }
             .padding(.top, 300)
         }

@@ -20,9 +20,7 @@ struct HomeView: View {
                     // Create a spacer to push content down from the top
                     Spacer(minLength: 150)
                     
-                    // Center the ContentUnavailableView horizontally
                     HStack {
-//                        Spacer()
                         ContentUnavailableView {
                             Label("Your Lineup is Empty", systemImage: "film")
                                 .font(.title2)
@@ -37,12 +35,7 @@ struct HomeView: View {
                             }
                             .padding(.top, 10)
                         }
-//                        Spacer()
                     }
-//                    .frame(maxWidth: .infinity)
-                    
-//                    // Add a spacer to push content up from the bottom
-//                    Spacer(minLength: 80)
                 }
                 else {
                     LineUpGridView()
