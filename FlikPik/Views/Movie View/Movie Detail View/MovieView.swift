@@ -43,10 +43,12 @@ struct MovieView: View {
                 } label: {
                     ZStack {
                         Circle()
+                            .foregroundColor(.white.opacity(0.5))
                             .foregroundStyle(.ultraThinMaterial)
                             .frame(width: 30, height: 30)
                         
                         Image(systemName: "chevron.backward")
+                            .foregroundColor(.white.opacity(0.5))
                             .fontWeight(.bold)
                             .foregroundStyle(.regularMaterial)
                     }

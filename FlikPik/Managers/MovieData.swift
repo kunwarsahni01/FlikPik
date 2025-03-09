@@ -113,12 +113,6 @@ struct MovieData: Identifiable, Codable {
         self.logoURL = logoURL
         self.streamingProviders = nil
         self.castMembers = nil
-        
-        // Debug: Print the URLs we're decoding
-        #if DEBUG
-        print("Decoded movie \(movie.id) with posterURL: \(String(describing: posterURL))")
-        print("Original string was: \(String(describing: posterURLString))")
-        #endif
     }
 }
 

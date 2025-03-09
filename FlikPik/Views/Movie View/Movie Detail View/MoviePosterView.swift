@@ -45,7 +45,7 @@ struct MoviePosterView: View {
 private enum MockData {
     static var sampleMovie: MovieData? {
         // This is just for preview purposes
-        guard let url = URL(string: "https://example.com") else { return nil }
+        guard let url = URL(string: "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg") else { return nil }
         
         let movie = Movie(
             id: 1,

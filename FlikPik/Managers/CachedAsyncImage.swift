@@ -92,9 +92,9 @@ struct CachedAsyncImage: View {
                     .fill(Color.gray.opacity(0.3))
                     .aspectRatio(aspectRatio, contentMode: .fit)
                     .cornerRadius(8)
-                    .overlay(
-                        ProgressView()
-                    )
+//                    .overlay(
+//                        ProgressView()
+//                    )
             }
         }
         .onAppear {

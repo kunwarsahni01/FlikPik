@@ -16,6 +16,7 @@ struct MovieMetadataView: View {
             Text(formatDate(releaseDate))
                 .font(.caption)
                 .fontWeight(.medium)
+                .foregroundColor(.white.opacity(0.5))
                 .foregroundStyle(.thinMaterial)
             
             Image(systemName: "circle.fill")
@@ -28,6 +29,7 @@ struct MovieMetadataView: View {
             Text(formatRuntime(runtime))
                 .font(.caption)
                 .fontWeight(.medium)
+                .foregroundColor(.white.opacity(0.5))
                 .foregroundStyle(.thinMaterial)
         }
         .padding(.horizontal)

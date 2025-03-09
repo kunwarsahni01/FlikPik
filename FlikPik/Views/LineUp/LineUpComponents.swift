@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import TMDb
+//import GlowGetter
 
 // Button for finding movies in empty state
 struct FindMoviesButton: View {
@@ -67,12 +69,8 @@ struct LineUpActionButton: View {
             .foregroundColor(.black)
             .background(Color.white)
             .cornerRadius(12)
+//            .glow(0.8, .rect(cornerRadius: 12))
         }
-//        .alert("Added to Lineup", isPresented: $showingAlert) {
-//            Button("OK", role: .cancel) { }
-//        } message: {
-//            Text("This movie has been added to your lineup.")
-//        }
         .onAppear {
             inLineUp = lineUpManager.isInLineUp(movie)
         }
@@ -102,8 +100,67 @@ extension View {
     }
 }
 
-#Preview {
+#Preview("FindMoviesButton") {
     VStack {
         FindMoviesButton()
     }
+    .background(Color.black)
+}
+
+#Preview("LineUpActionButton") {
+    // Create a sample movie for preview
+    let movie = Movie(
+        id: 1,
+        title: "Sample Movie",
+        overview: "This is a sample movie overview",
+        runtime: 120,
+        releaseDate: Date(),
+        posterPath: URL(string: "https://example.com/poster.jpg"),
+        backdropPath: URL(string: "https://example.com/backdrop.jpg")
+    )
+    
+    let movieData = MovieData(
+        movie: movie,
+        backdropURL: URL(string: "https://example.com/backdrop.jpg"),
+        posterURL: URL(string: "https://example.com/poster.jpg"),
+        logoURL: nil
+    )
+    
+    return VStack(spacing: 20) {
+        LineUpActionButton(movie: movieData)
+    }
+    .environment(LineUpManager())
+    .background(Color.black)
+}
+
+#Preview("LineUpContextMenu") {
+    let movie = Movie(
+        id: 1,
+        title: "Sample Movie",
+        overview: "This is a sample movie overview",
+        runtime: 120,
+        releaseDate: Date(),
+        posterPath: URL(string: "https://example.com/poster.jpg"),
+        backdropPath: URL(string: "https://example.com/backdrop.jpg")
+    )
+    
+    let movieData = MovieData(
+        movie: movie,
+        backdropURL: URL(string: "https://example.com/backdrop.jpg"),
+        posterURL: URL(string: "https://example.com/poster.jpg"),
+        logoURL: nil
+    )
+    
+    let lineUpManager = LineUpManager()
+    
+    return VStack {
+        Text("Long press to see context menu")
+            .padding()
+            .background(Color.gray.opacity(0.2))
+            .cornerRadius(8)
+            .lineUpContextMenu(for: movieData)
+    }
+    .environment(lineUpManager)
+    .background(Color.black)
+    .foregroundColor(.white)
 }
